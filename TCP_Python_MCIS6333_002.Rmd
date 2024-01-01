@@ -1,0 +1,68 @@
+---
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+```{r}
+if(!require("tidyverse")) install.packages("tidyverse")
+if(!require("fs")) install.packages("fs")
+if(!require("scales")) install.packages("scales")
+if(!require("readxl")) install.packages("readxl")
+if(!require("RColorBrewer")) install.packages("RColorBrewer")
+if(!require("ggplot2")) install.packages("ggplot2")
+library(tidyverse)
+library(fs)
+library(scales)
+library(readxl)
+library(dplyr)
+library(RColorBrewer)
+library(ggplot2)
+
+df_M1 <- read_excel("4 - Food and Beverage Stand - M1 - Initial dataset.xlsx")
+
+# See what the data for that sheet looks like
+head(df_M1)
+
+# Or look at the entire data frame in a table in a new tab
+view(df_M1)
+
+
+df_M3 <- read_excel("4 - Food and Beverage Stand - M3 - Data Composition.xlsx")
+
+# See what the data for that sheet looks like
+head(df_M3)
+
+# Or look at the entire data frame in a table in a new tab
+view(df_M3)
+
+#merging the two data frames
+df_merge <- merge(df_M1, df_M3, by = c("ID"))   
+
+# See what the data for that sheet looks like
+head(df)
+
+# Or look at the entire data frame in a table in a new tab
+view(df)
+
+df = data.frame(df_merge$Q2, df_merge$Q11)
+df
+
+mean_grouped <- df %>% group_by(df_merge.Q2) %>% summarise(mean = mean(df_merge.Q11))
+print(mean_grouped)
+#printing mean
+print(mean_grouped)
+
+sum_mean <- sum(mean_grouped$mean)
+sum_mean
+percent_mean <- sprintf("%.0f%%", 100 *(mean_grouped$mean/sum_mean))
+percent_mean
+
+# Define the ethnicity labels
+ethnicity_labels <- c("African American","Mexican American","Other Hispanic","Asian","Southeast Asian","Pacific Islander","Filipino","Multiple Ethnicities","White","Other/Not Stated","International")
+
+# Plotting the pie diagram
+g <- ggplot(mean_grouped, aes(x = "", y = mean_grouped$mean, fill = factor(mean_grouped$df_merge.Q2, labels = ethnicity_labels))) + geom_col(color = "white") + ggtitle("Food and Beverage Stand") + geom_text(aes(x = 1.5, label = percent_mean), position = position_stack(vjust = 0.5), labels = ethnicity_labels) + coord_polar("y") + display.brewer.all() + theme_void() + theme(plot.title = element_text(hjust = 0.5)) + theme(legend.title=element_blank())
+g # To show the DV on the screen
+ggsave("Food and Beverage Stand-R.png")
+```
+
